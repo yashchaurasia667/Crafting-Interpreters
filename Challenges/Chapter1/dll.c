@@ -15,6 +15,9 @@ void printList(node_t *head)
   while (tmp != NULL)
   {
     printf("%d - ", tmp->value);
+    // printf("%p - ", tmp->prev);
+    // printf("%p - ", tmp->next);
+    // printf("\n");
     tmp = (*tmp).next;
   }
   printf("\n");
@@ -35,9 +38,10 @@ node_t *addNode(int value, int position, node_t *head)
   node_t *insertion = newNode(value);
 
   // to insert at head
-  if (position == 0)
+  if (!position)
   {
     insertion->next = head;
+    head->prev = insertion;
     return insertion;
   }
 
@@ -62,22 +66,65 @@ node_t *addNode(int value, int position, node_t *head)
   return head;
 }
 
+node_t *deleteNode(int position, node_t *head)
+{
+  // removing head node
+  if (position == 1)
+    return head->next;
+
+  node_t *tmp = head->next;
+  int counter = 2;
+
+  while (counter < position)
+  {
+    counter++;
+    if (tmp->next == NULL)
+      break;
+    tmp = tmp->next;
+  }
+
+  if (tmp->next != NULL)
+  {
+    tmp->prev->next = tmp->next;
+    tmp->next->prev = tmp->prev;
+  }
+  else if (counter == position)
+    tmp->prev->next = NULL;
+
+  return head;
+}
+
 int main()
 {
   node_t *head;
-
-  node_t *n1 = newNode(11);
-  node_t *n2 = newNode(12);
-  node_t *n3 = newNode(13);
+  node_t *n1 = newNode(9);
 
   head = n1;
-  n1->next = n2;
-  n2->next = n3;
-  n3->next = NULL;
+  node_t *tmp = head;
+  for (int i = 0; i < 5; i++)
+  {
+    node_t *nNode = newNode(i + 10);
+    tmp->next = nNode;
+    nNode->prev = tmp;
+    tmp = tmp->next;
 
+    // printf("%d - ", tmp->value);
+  }
+
+  // add a node at head
+  head = addNode(8, 0, head);
   printList(head);
-  head = addNode(10, 0, head);
-  head = addNode(14, 4, head);
+  // add a node at the end
+  head = addNode(15, 7, head);
+  printList(head);
+  // deleting the head node
+  head = deleteNode(1, head);
+  printList(head);
+  // deleting a middle node
+  head = deleteNode(5, head);
+  printList(head);
+  // deleting the last node
+  head = deleteNode(7, head);
   printList(head);
 
   return 0;
