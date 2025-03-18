@@ -9,7 +9,7 @@ import static Java.com.craftinginterpreters.lox.TokenType.*;
 
 class Scanner {
   private final String source;
-  private final List<Token> tokens = new ArrayList();
+  private final List<Token> tokens = new ArrayList<Token>();
   private int start = 0;
   private int current = 0;
   private int line = 1;
@@ -94,11 +94,30 @@ class Scanner {
       default:
         if (isDigit(c)) {
           number();
+        } else if (isAlpha(c)) {
+          identifier();
         } else {
           Lox.error(line, "Unexpected character");
         }
         break;
     }
+  }
+
+  private void identifier() {
+    while (isAlphaNumeric(peek())) {
+      advance();
+    }
+
+    addToken(INDENTIFIER);
+  }
+
+  private boolean isAlpha(char c) {
+    return (c >= 'a' && c <= 'z') ||
+        (c >= 'A' && c <= 'Z') || c == '_';
+  }
+
+  private boolean isAlphaNumeric(char c) {
+    return isAlpha(c) || isDigit(c);
   }
 
   private void number() {
@@ -116,9 +135,11 @@ class Scanner {
 
   private void string() {
     // advance until "
+    System.out.println(peek());
     while (peek() != '"' && !isAtEnd()) {
       if (peek() == '\n')
-        advance();
+        line++;
+      advance();
     }
 
     if (isAtEnd()) {
