@@ -125,11 +125,14 @@ class Scanner {
   }
 
   private void identifier() {
-    while (isAlphaNumeric(peek())) {
+    while (isAlphaNumeric(peek()))
       advance();
-    }
 
-    addToken(INDENTIFIER);
+    String text = source.substring(start, current);
+    TokenType type = keywords.get(text);
+    if (type == null)
+      type = INDENTIFIER;
+    addToken(type);
   }
 
   private boolean isAlpha(char c) {
@@ -156,7 +159,6 @@ class Scanner {
 
   private void string() {
     // advance until "
-    System.out.println(peek());
     while (peek() != '"' && !isAtEnd()) {
       if (peek() == '\n')
         line++;
